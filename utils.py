@@ -17,21 +17,21 @@ def safe_len(foo):
 
 
 def center_pad(string, length):
-    if len(string)>length:
+    if len(string) > length:
         string = string[:max(0, length-3)]+'...'
-    if len(string)<length:
-        dif=length-len(string)
-        pad=''.join(' ' for i in range(dif//2))
-        string=pad+string+pad
+    if len(string) < length:
+        dif = length-len(string)
+        pad = ''.join(' ' for i in range(dif//2))
+        string = pad+string+pad
         if dif & 1:
             string += ' '
     return string
 
 
 def left_pad(string, length):
-    if len(string)>length:
+    if len(string) > length:
         string = string[:max(0, length-3)]+'...'
-    if len(string)<length:
+    if len(string) < length:
         pad = ''.join(' ' for i in range(length-len(string)))
         string = string+pad
     return string
@@ -61,4 +61,3 @@ def table(logs):
         if a == 0:
             out += '-'.join('' for i in range(sum(lens)+6))+'|\n|'
     return out + '-'.join('' for i in range(sum(lens)+6))+'|'
-

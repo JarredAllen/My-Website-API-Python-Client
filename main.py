@@ -6,6 +6,7 @@
 # It should work on both Windows and Linux, but it has not been tested there.
 #
 ###############################################################################
+"""This is a command line-like interface for the client in interface.py"""
 
 from interface import Interface
 from utils import *
@@ -16,8 +17,6 @@ while True:
     command=input('> ')
     if command[:4] == 'exit':
         break
-    elif command[:5] == 'state':
-        print('-', client)
     elif command[:5] == 'login':
         if command[5:].strip()[:6] == '--help':
             print('- Syntax Options:', '-\t\tlogin {email} {password}',
@@ -26,7 +25,7 @@ while True:
         try:
             creds = command.split()[1:]
             try:
-                creds[0]=int(creds[0])
+                creds[0] = int(creds[0])
             except ValueError:
                 pass
             if client.login(creds[0], creds[1]):
@@ -40,6 +39,8 @@ while True:
         command = command[4:].strip()
         if command[:7] == 'history':
             print(table(client.get_calculation_history()))
+        elif command[:5] == 'state':
+            print('-', client)
         else:
             print('- Unrecognized attribute')
     elif command[:6] == 'logout':

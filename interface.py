@@ -30,21 +30,30 @@ class Credentials:
 
 
 class Interface:
+    """A client for interfacing with my web server's API."""
     def __init__(self, address='localhost'):
+        """Creates a new client with its own internal state."""
         self.__logged_in = False
         self.__address = address
         self.__connection = HTTPConnection(address)
         self.__token = self.__get_token()
     
     def get_token(self):
+        """Return the session token used by the client."""
         return self.__token
     
     def __get_token(self):
+        """Connect to the server and get a token."""
         conn = self.__connection
         conn.request('POST', '/api.php/token')
         return json_decode(conn.getresponse().read().decode('utf-8'))['token']
     
     def login(self, user, password):
+        """Log in to the server with the given credentials.
+        
+        User can be the userid or the email address of the user. This gets a new
+        session token from the server, as well.
+        """
         body = json_encode(Credentials(self.__token, user, password))
         conn = self.__connection
         conn.connect()
@@ -57,6 +66,7 @@ class Interface:
         return False
     
     def logout(self):
+        """Log out from the server."""
         conn = self.__connection
         conn.connect()
         conn.request('POST', '/api.php/logout',
@@ -66,7 +76,8 @@ class Interface:
     
     def get_calculation_history(self, user="current", sortby="Timestamp",
                                 page=-1, pagesize=10):
-        body = '{"token":"'+self.__token+'"}'
+        """Return the user's calculation history as a JSON object"""
+        body = json_encode({"token": self.__token})
         conn = self.__connection
         conn.connect()
         url = ('/api.php/calculations?user=' + str(user) + '&sortby='
