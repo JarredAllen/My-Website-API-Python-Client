@@ -1,7 +1,7 @@
 ###############################################################################
 # !/user/local/bin/python3
 #
-# This file defines a class that stores a stateful interface.
+# This file defines a class that stores a stateful interface to the webserver.
 #
 ###############################################################################
 
@@ -57,7 +57,11 @@ class Interface:
         return False
     
     def logout(self):
-        pass
+        conn = self.__connection
+        conn.connect()
+        conn.request('POST', '/api.php/logout',
+                     body=json_encode({"token": self.__token}))
+        conn.getresponse().read()
         self.__logged_in = False
     
     def get_calculation_history(self, user="current", sortby="Timestamp",
@@ -65,8 +69,9 @@ class Interface:
         body = '{"token":"'+self.__token+'"}'
         conn = self.__connection
         conn.connect()
-        url = '/api.php/calculations?user='+str(user)+'&sortby='+str(sortby)\
-              +'&page='+str(page)+'&pagesize='+str(pagesize)
+        url = ('/api.php/calculations?user=' + str(user) + '&sortby='
+               + str(sortby) + '&page=' + str(page) + '&pagesize='
+               + str(pagesize))
         conn.request('POST', url, body=body)
         response = conn.getresponse()
         return json_decode(response.read().decode('utf-8'))
