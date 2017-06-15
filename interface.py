@@ -126,6 +126,17 @@ class Interface:
         conn.request("POST", '/api.php/userid', body)
         return int(json_decode(conn.getresponse().read().decode('utf-8'))["id"])
     
+    def get_account_details(self):
+        if not self.__logged_in:
+            return ['Not logged in']
+        body = json_encode({"token": self.__token})
+        conn = self.__connection
+        conn.connect()
+        conn.request("POST", '/api.php/accounts/current', body)
+        response = json_decode(conn.getresponse().read().decode('utf-8'))
+        return [response['username'], response['email'], response['userid']]
+        
+    
     def __repr__(self):
         string = 'interface pointing to '+self.__address
         string += ' with session token '+self.__token
