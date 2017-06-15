@@ -6,6 +6,7 @@
 ###############################################################################
 
 from http.client import HTTPConnection
+from functools import lru_cache
 import json
 
 __all__ = ['Interface']
@@ -62,6 +63,7 @@ class Interface:
         if response.status == 200:
             self.__token = json_decode(response.read().decode('utf-8'))['token']
             self.__logged_in = True
+            self.get_operations.cache_clear()
             return True
         return False
     
@@ -73,6 +75,7 @@ class Interface:
                      body=json_encode({"token": self.__token}))
         conn.getresponse().read()
         self.__logged_in = False
+        self.get_operations.cache_clear()
     
     def get_calculation_history(self, user="current", sortby="Timestamp",
                                 page=-1, pagesize=10):
@@ -87,11 +90,47 @@ class Interface:
         response = conn.getresponse()
         return json_decode(response.read().decode('utf-8'))
     
+    @lru_cache()
+    def get_operations(self):
+        body = json_encode({"token": self.__token})
+        conn = self.__connection
+        conn.connect()
+        conn.request("POST", '/api.php/calculate/operations', body)
+        response = conn.getresponse()
+        out = json_decode(response.read().decode('utf-8'))
+        ops = []
+        for op in out:
+            if 'requiredCredentials' in out[op]:
+                if out[op]['requiredCredentials'] == 'login':
+                    if self.__logged_in:
+                        ops.append(op)
+            else:
+                ops.append(op)
+        return ops
+    
+    def calculate(self, operator, *nums):
+        body = json_encode({"token": self.__token})
+        conn = self.__connection
+        conn.connect()
+        uri = '/api.php/calculate/'+operator+'/'+'/'.join(str(i) for i in nums)
+        conn.request("POST", uri, body)
+        response = conn.getresponse()
+        return json_decode(response.read().decode('utf-8'))["result"]
+    
+    def get_id(self):
+        if not self.__logged_in:
+            return None
+        body = json_encode({"token": self.__token})
+        conn = self.__connection
+        conn.connect()
+        conn.request("POST", '/api.php/userid', body)
+        return int(json_decode(conn.getresponse().read().decode('utf-8'))["id"])
+    
     def __repr__(self):
         string = 'interface pointing to '+self.__address
         string += ' with session token '+self.__token
         if self.__logged_in:
-            string += ' and logged in on the server'
+            string += ' and logged as user with id='+str(self.get_id())
         return string
     
     def __del__(self):

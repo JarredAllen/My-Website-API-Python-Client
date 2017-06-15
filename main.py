@@ -46,6 +46,24 @@ while True:
     elif command[:6] == 'logout':
         client.logout()
         print('-', 'Logout successful')
+    elif command[:9] == 'calculate':
+        op = command[9:].strip().split()
+        ops = client.get_operations()
+        if len(op) > 0 and op[0] in ops:
+            operator = op[0]
+            nums = []
+            for i in op[1:]:
+                nums.append(i)
+            result = client.calculate(operator, *nums)
+            if result[0] != '-':
+                result = '+'+result
+            print('-', result)
+        else:
+            if len(op) == 0 or op[0] != '--help':
+                print('- Unrecognized calculation.')
+            print('- Recognized calculations:')
+            for i in ops:
+                print('-\t\t', i)
     else:
         print('- Unknown command')
 print('- Bye')
