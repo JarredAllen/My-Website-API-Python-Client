@@ -135,7 +135,17 @@ class Interface:
         conn.request("POST", '/api.php/accounts/current', body)
         response = json_decode(conn.getresponse().read().decode('utf-8'))
         return [response['username'], response['email'], response['userid']]
-        
+    
+    def create_new_account(self, email, password, username):
+        if self.__logged_in:
+            self.logout()
+        body = json_encode({"token": self.__token, "email": email,
+                            "password": password, "username":username})
+        conn = self.__connection
+        conn.connect()
+        conn.request("POST", '/api.php/accounts', body)
+        conn.getresponse().read()
+        self.login(email, password)
     
     def __repr__(self):
         string = 'interface pointing to '+self.__address

@@ -59,11 +59,21 @@ while True:
                   cmds[cmd], sep='')
         print('- Enter "{cmd} --help" for more information on the command.')
     elif command[0] == 'login':
-        if command[1] == '--help':
+        if command[1] == '--help' or len(command) < 3:
             print('- Syntax Options:', '-\t\tlogin {email} {password}',
-                  '-\t\tlogin {userid} {password}', sep='\n')
+                  '-\t\tlogin {userid} {password}',
+                  '-\t\tlogin new {email} {password} [{username}]', sep='\n')
             continue
-        try:
+        elif command[1] == 'new':
+            if len(command) < 4:
+                print('- Syntax:')
+                print('-\t\tlogin new {email} {password} [{username}]')
+                continue
+            if len(command) == 4:
+                command.append(command[2].split('@')[0])
+            client.create_new_account(command[2], command[3],
+                                      ' '.join(command[4:]))
+        else:
             creds = command[1:]
             try:
                 creds[0] = int(creds[0])
@@ -73,9 +83,6 @@ while True:
                 print('-', 'Login successful')
             else:
                 print('-', 'Login failed')
-        except IndexError:
-            print('- Syntax Options:', '-\t\tlogin {email} {password}',
-                  '-\t\tlogin {userid} {password}', sep='\n')
     elif command[0] == 'logout':
         client.logout()
         print('-', 'Logout successful')
