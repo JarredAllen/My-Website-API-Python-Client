@@ -14,9 +14,9 @@ from utils import *
 client = Interface()
 
 while True:
-    command = input('> ')
-    if command[:9] == 'calculate':
-        op = command[9:].strip().split()
+    command = input('> ').strip().split()
+    if command[0] == 'calculate':
+        op = command[1:]
         ops = client.get_operations()
         if len(op) > 0 and op[0] in ops:
             operator = op[0]
@@ -31,16 +31,16 @@ while True:
             if len(op) == 0 or op[0] != '--help':
                 print('- Unrecognized calculation.')
             else:
-                print('-Syntax:')
-                print('-\t\tcalculate {operation} {number...}')
+                print('- Syntax:')
+                print('-\t\tcalculate {operation} {operand(s)...}')
             print('- Recognized operations:')
             for i in ops:
                 print('-\t\t', i)
-    elif command[:4] == 'exit':
+    elif command[0] == 'exit':
         break
-    elif command[:4] == 'help':
+    elif command[0] == 'help':
         try:
-            if command[4:].strip().split()[0] == '--help':
+            if command[1] == '--help':
                 print('- Syntax:')
                 print('-\t\thelp')
                 continue
@@ -58,13 +58,13 @@ while True:
             print('-\t\t', cmd+''.join('\t' for i in range((15-len(cmd))//4)),
                   cmds[cmd], sep='')
         print('- Enter "{cmd} --help" for more information on the command.')
-    elif command[:5] == 'login':
-        if command[5:].strip()[:6] == '--help':
+    elif command[0] == 'login':
+        if command[1] == '--help':
             print('- Syntax Options:', '-\t\tlogin {email} {password}',
                   '-\t\tlogin {userid} {password}', sep='\n')
             continue
         try:
-            creds = command.split()[1:]
+            creds = command[1:]
             try:
                 creds[0] = int(creds[0])
             except ValueError:
@@ -76,26 +76,28 @@ while True:
         except IndexError:
             print('- Syntax Options:', '-\t\tlogin {email} {password}',
                   '-\t\tlogin {userid} {password}', sep='\n')
-    elif command[:6] == 'logout':
+    elif command[0] == 'logout':
         client.logout()
         print('-', 'Logout successful')
-    elif command[:4] == 'view':
-        command = command[4:].strip()
-        if command[:6] == '--help':
+    elif command[0] == 'view':
+        if len(command) < 2 or command[1] == '--help':
             print('- Syntax:')
             print('-\t\tview {state}')
             print('- Recognized options:')
             print('-\t\taccount')
             print('-\t\thistory')
             print('-\t\tstate')
-        elif command[:7] == 'account':
+        elif command[1] == 'account':
             out = client.get_account_details()
-            print('- ', 'Username:\t\t\t',   out[0], sep='')
-            print('- ', 'E-mail Address:\t', out[1], sep='')
-            print('- ', 'User ID #:\t\t',    out[2], sep='')
-        elif command[:7] == 'history':
+            if len(out) > 1:
+                print('- ', 'Username:\t\t\t',   out[0], sep='')
+                print('- ', 'E-mail Address:\t', out[1], sep='')
+                print('- ', 'User ID #:\t\t',    out[2], sep='')
+            else:
+                print('-', out[0])
+        elif command[1] == 'history':
             print(table(client.get_calculation_history()))
-        elif command[:5] == 'state':
+        elif command[1] == 'state':
             print('-', client)
         else:
             print('- Unrecognized attribute')
