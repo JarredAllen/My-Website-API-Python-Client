@@ -69,6 +69,7 @@ class Interface:
     
     def logout(self):
         """Log out from the server."""
+        ret = self.__logged_in
         conn = self.__connection
         conn.connect()
         conn.request('POST', '/api.php/logout',
@@ -76,6 +77,7 @@ class Interface:
         conn.getresponse().read()
         self.__logged_in = False
         self.get_operations.cache_clear()
+        return ret
     
     def get_calculation_history(self, user="current", sortby="Timestamp",
                                 page=-1, pagesize=10):

@@ -84,8 +84,10 @@ while True:
             else:
                 print('-', 'Login failed')
     elif command[0] == 'logout':
-        client.logout()
-        print('-', 'Logout successful')
+        if client.logout():
+            print('-', 'Logout successful')
+        else:
+            print('-', 'You were not logged in')
     elif command[0] == 'view':
         if len(command) < 2 or command[1] == '--help':
             print('- Syntax:')
