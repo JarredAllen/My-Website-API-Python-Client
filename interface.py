@@ -142,7 +142,7 @@ class Interface:
         if self.__logged_in:
             self.logout()
         body = json_encode({"token": self.__token, "email": email,
-                            "password": password, "username":username})
+                            "password": password, "username": username})
         conn = self.__connection
         conn.connect()
         conn.request("POST", '/api.php/accounts', body)

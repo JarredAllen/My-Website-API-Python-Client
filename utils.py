@@ -21,7 +21,7 @@ def center_pad(string, length):
         string = string[:max(0, length-3)]+'...'
     if len(string) < length:
         dif = length-len(string)
-        pad = ''.join(' ' for i in range(dif//2))
+        pad = ' ' * (dif//2)
         string = pad+string+pad
         if dif & 1:
             string += ' '
@@ -32,7 +32,7 @@ def left_pad(string, length):
     if len(string) > length:
         string = string[:max(0, length-3)]+'...'
     if len(string) < length:
-        pad = ''.join(' ' for i in range(length-len(string)))
+        pad = ' ' * (length-len(string))
         string = string+pad
     return string
 
@@ -51,7 +51,7 @@ def table(logs):
     # print(lens)
     for a in range(len(data)):
         if a == 0:
-            out += '-'.join('' for i in range(sum(lens)+6)) + '|\n|'
+            out += '-' * (sum(lens)+5) + '|\n|'
         for b in range(len(data[a])):
             if a == 0:
                 out += center_pad(str(data[a][b]), lens[b]) + '|'
@@ -59,5 +59,5 @@ def table(logs):
                 out += left_pad(' '+str(data[a][b]), lens[b]) + '|'
         out += '\n|'
         if a == 0:
-            out += '-'.join('' for i in range(sum(lens)+6))+'|\n|'
-    return out + '-'.join('' for i in range(sum(lens)+6))+'|'
+            out += '-' * (sum(lens)+5) + '|\n|'
+    return out + '-' * (sum(lens)+5) + '|'
